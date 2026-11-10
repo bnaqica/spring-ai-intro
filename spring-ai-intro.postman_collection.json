@@ -1,0 +1,118 @@
+{
+  "info": {
+    "name": "Spring AI Intro",
+    "description": "Endpoints of the spring-ai-intro Spring Boot app, which calls OpenAI through Spring AI.\n\nStart the app with `./gradlew bootRun` (needs OPENAI_API_KEY set). Change the `baseUrl` collection variable if it doesn't run on localhost:8080.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Ask a question",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"question\": \"Write a haiku about Spring Boot\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ask",
+          "host": ["{{baseUrl}}"],
+          "path": ["ask"]
+        },
+        "description": "Sends a free-form question to the chat model. Returns `{ \"answer\": \"...\" }`."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+              "pm.test('Has answer', () => pm.expect(pm.response.json().answer).to.be.a('string').and.not.empty);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get capital",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"stateOrCountry\": \"France\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/capital",
+          "host": ["{{baseUrl}}"],
+          "path": ["capital"]
+        },
+        "description": "Returns the capital of a state or country as structured output (BeanOutputConverter → GetCapitalResponse). Returns `{ \"answer\": \"Paris\" }`."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+              "pm.test('Has answer', () => pm.expect(pm.response.json().answer).to.be.a('string').and.not.empty);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get capital with info",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"stateOrCountry\": \"Japan\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/capitalWithInfo",
+          "host": ["{{baseUrl}}"],
+          "path": ["capitalWithInfo"]
+        },
+        "description": "Returns the capital plus population, region, language and currency (BeanOutputConverter → CapitalWithInfoResponse)."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+              "pm.test('Has all fields', () => {",
+              "    const body = pm.response.json();",
+              "    ['city', 'population', 'region', 'language', 'currency'].forEach(f => pm.expect(body).to.have.property(f));",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
